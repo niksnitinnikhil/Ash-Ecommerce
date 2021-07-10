@@ -150,18 +150,20 @@ namespace Ecommerce
         static void Main(string[] args)
         {
             var cart = new Cart();
+           
             var apple = new Product("Apple", 200);
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", apple, 2, 1));
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", apple, 2, 1));
             cart.AddCartItem(apple, 1);
             cart.AddCartItem(apple, 2);
+           
             var orange = new Product("Orange", 100);
-            cart.AddCartItem(orange, 3);
-            cart.ApplyDiscountOnCartItem();
+            cart.AddCartItem(orange, 3);           
 
             var banana = new Product("Banana", 100);
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", banana, 2, 1));
             cart.AddCartItem(banana, 5);
+            
             cart.ApplyDiscountOnCartItem();
 
             Console.WriteLine(cart);
