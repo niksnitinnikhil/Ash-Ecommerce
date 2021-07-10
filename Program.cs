@@ -158,7 +158,7 @@ namespace Ecommerce
 
         public string Name { get; }
 
-        public string UniqueKey { get { return Guid.NewGuid().ToString(); } }
+        public string UniqueKey { get { return string.Concat(NeedToBuy.Select(x => x.Name)) + Name; } }
         private List<Product> NeedToBuy { get; }
         private List<Product> FreeItem { get; }
 
