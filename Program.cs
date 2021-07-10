@@ -145,6 +145,36 @@ namespace Ecommerce
         }
     }
 
+    public class BuyTypeOfItemAndSpecificItemFree : IDiscount
+    {
+        public BuyTypeOfItemAndSpecificItemFree(string name, Action<List<Product>> needToBuy, Action<List<Product>> freeItem)
+        {
+            NeedToBuy = new List<Product>();
+            FreeItem = new List<Product>();
+            Name = name;
+            needToBuy(NeedToBuy);
+            freeItem(FreeItem);
+        }
+
+        public string Name { get; }
+
+        public string UniqueKey { get { return Guid.NewGuid().ToString(); } }
+        private List<Product> NeedToBuy { get; }
+        private List<Product> FreeItem { get; }
+
+        public void DiscountApply(IEnumerable<CartItem> cartItem)
+        {
+            if (NeedToBuy.All(c => cartItem.Any(x => x.Product.Equals(c))))
+            {
+                foreach (var item in cartItem.Where(c => FreeItem.Any(x => x.Equals(c.Product))))
+                {
+                    item.DiscountPrice = item.Product.Price;
+                    item.AddOffer(this);
+                }
+            }
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -163,6 +193,28 @@ namespace Ecommerce
             var banana = new Product("Banana", 100);
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", banana, 2, 1));
             cart.AddCartItem(banana, 5);
+
+
+
+            var redShirt = new Product("Red Shirt", 300);
+            cart.AddCartItem(redShirt, 1);
+
+
+
+            var whiteShirt = new Product("White Shirt", 200);
+            cart.AddCartItem(whiteShirt, 1);
+
+            var blackShirt = new Product("Black Shirt", 300);
+            cart.AddCartItem(blackShirt, 1);
+
+
+            cart.AddDiscount(new BuyTypeOfItemAndSpecificItemFree("Buy Red & White Shirt , Get Only One Black Shirt free", c =>
+            {
+                c.Add(redShirt);
+                c.Add(whiteShirt);
+            },
+            c => c.Add(blackShirt)));
+
 
             cart.ApplyDiscountOnCartItem();
 
