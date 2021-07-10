@@ -1,6 +1,5 @@
 # Ash-Ecommerce
 
-Output will be of Program
 
  ---------------------------------------------------------------------------------------------------------------------
  | Product     | Price  | Quanity | Discount | Applied Discount                                      | Payable Price |
