@@ -1,4 +1,4 @@
-﻿using ConsoleTables;
+using ConsoleTables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,11 +42,10 @@ namespace Ecommerce
 
         public void ApplyDiscountOnCartItem()
         {
-            foreach (var item in this)
-                foreach (var f in _offers)
-                {
-                    item.AddOffer(f.Value);
-                }
+            foreach (var f in _offers)
+            {
+                f.Value.DiscountApply(this);
+            }
         }
 
         public override string ToString()
@@ -84,8 +83,7 @@ namespace Ecommerce
 
         public void AddOffer(IDiscount discount)
         {
-            if (discount.DiscountApply(this))
-                _offers.TryAdd(discount.UniqueKey, discount);
+            _offers.TryAdd(discount.UniqueKey, discount);
         }
 
         public IReadOnlyCollection<IDiscount> GetAllAppliedDiscount()
@@ -112,7 +110,7 @@ namespace Ecommerce
     {
         public string Name { get; }
         public string UniqueKey { get; }
-        public bool DiscountApply(CartItem cartItem);
+        public void DiscountApply(IEnumerable<CartItem> cartItem);
 
     }
 
@@ -134,14 +132,16 @@ namespace Ecommerce
         private int N { get; }
         private int X { get; }
 
-        public bool DiscountApply(CartItem cartItem)
+        public void DiscountApply(IEnumerable<CartItem> cartItems)
         {
-            if (cartItem.Product.Equals(Product) && cartItem.Quantity > N)
+            foreach (var cartItem in cartItems)
             {
-                cartItem.DiscountPrice = (cartItem.Quantity - (cartItem.Quantity - Math.Floor((decimal)cartItem.Quantity / (X + N)))) * cartItem.Product.Price;
-                return true;
+                if (cartItem.Product.Equals(Product) && cartItem.Quantity > N)
+                {
+                    cartItem.DiscountPrice = (cartItem.Quantity - (cartItem.Quantity - Math.Floor((decimal)cartItem.Quantity / (X + N)))) * cartItem.Product.Price;
+                    cartItem.AddOffer(this);
+                }
             }
-            return false;
         }
     }
 
@@ -150,20 +150,20 @@ namespace Ecommerce
         static void Main(string[] args)
         {
             var cart = new Cart();
-           
+
             var apple = new Product("Apple", 200);
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", apple, 2, 1));
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", apple, 2, 1));
             cart.AddCartItem(apple, 1);
             cart.AddCartItem(apple, 2);
-           
+
             var orange = new Product("Orange", 100);
-            cart.AddCartItem(orange, 3);           
+            cart.AddCartItem(orange, 3);
 
             var banana = new Product("Banana", 100);
             cart.AddDiscount(new BuyNItemAndXFree("Buy two, get one free", banana, 2, 1));
             cart.AddCartItem(banana, 5);
-            
+
             cart.ApplyDiscountOnCartItem();
 
             Console.WriteLine(cart);
