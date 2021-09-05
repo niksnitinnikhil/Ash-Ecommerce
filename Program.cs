@@ -26,10 +26,10 @@ namespace Ecommerce
             return cartItem;
         }
 
-        public void AddDiscount(params IDiscount[] offer)
+        public void AddDiscount(params IDiscount[] offers)
         {
-            foreach (var f in offer)
-                _offers.TryAdd(f.UniqueKey, f);
+            foreach (var offer in offers)
+                _offers.TryAdd(offer.UniqueKey, offer);
         }
 
         public decimal Total
@@ -42,18 +42,18 @@ namespace Ecommerce
 
         public void ApplyDiscountOnCartItem()
         {
-            foreach (var f in _offers)
+            foreach (var offer in _offers)
             {
-                f.Value.DiscountApply(this);
+                offer.Value.DiscountApply(this);
             }
         }
 
         public override string ToString()
         {
-            var ct = new ConsoleTable("Product", "Price", "Quanity", "Discount", "Applied Discount", "Payable Price");
-            foreach (var c in this)
-                ct.AddRow(c.Product.Name, c.Product.Price.ToString("0.00"), c.Quantity, c.DiscountPrice.ToString("0.00"), string.Join(Environment.NewLine, c.GetAllAppliedDiscount().Select(c => c.Name)), c.PayablePrice.ToString("0.00"));
-            ct.AddRow(string.Empty, string.Empty, string.Empty, string.Empty, "Total Cart Price:", this.Total.ToString("0.00"));
+            var consoleTable = new ConsoleTable("Product", "Price", "Quanity", "Discount", "Applied Discount", "Payable Price");
+            foreach (var cart in this)
+                consoleTable.AddRow(cart.Product.Name, cart.Product.Price.ToString("0.00"), cart.Quantity, cart.DiscountPrice.ToString("0.00"), string.Join(Environment.NewLine, cart.GetAllAppliedDiscount().Select(c => c.Name)), cart.PayablePrice.ToString("0.00"));
+            consoleTable.AddRow(string.Empty, string.Empty, string.Empty, string.Empty, "Total Cart Price:", this.Total.ToString("0.00"));
             return ct.ToString();
         }
     }
